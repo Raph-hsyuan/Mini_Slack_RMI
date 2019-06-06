@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/MiniSlack.iml" filepath="$PROJECT_DIR$/MiniSlack.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MiniSlackCllient/MiniSlackCllient.iml" filepath="$PROJECT_DIR$/MiniSlackCllient/MiniSlackCllient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MiniSlackServer/MiniSlackServer.iml" filepath="$PROJECT_DIR$/MiniSlackServer/MiniSlackServer.iml" />
+    </modules>
+  </component>
+</project>

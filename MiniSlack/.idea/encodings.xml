@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/MiniSlackCllient/src/HelloWorld.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/MiniSlackCllient/src/HelloWorldClient.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/MiniSlackCllient/src/Resultat.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/MiniSlackCllient/src/Service.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/MiniSlackServer/src/HelloWorld.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/MiniSlackServer/src/HelloWorldImpl.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/MiniSlackServer/src/HelloWorldServer.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/MiniSlackServer/src/Resultat.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/MiniSlackServer/src/Service.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/MiniSlackServer/src/ServiceImpl.java" charset="ISO-8859-1" />
+  </component>
+</project>
