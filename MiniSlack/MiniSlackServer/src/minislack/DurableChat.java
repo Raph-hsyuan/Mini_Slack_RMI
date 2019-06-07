@@ -43,6 +43,11 @@ public class DurableChat implements
 
 
     public DurableChat(String broker, String username, String password) {
+        startDurableChat(broker,username,password);
+    }
+
+
+    public void startDurableChat(String broker, String username, String password){
         this.username = username;
         //Create a connection:
         try {
@@ -60,8 +65,6 @@ public class DurableChat implements
             jmse.printStackTrace();
             System.exit(1);
         }
-
-
     }
 
     /**
@@ -75,8 +78,13 @@ public class DurableChat implements
             // This handler reads a single String from the
             // message and prints it to the standard output.
             try {
-                String string = textMessage.getText();
-                messageInterface.displayMsg(string);
+                if(messageInterface!=null){
+                    messageInterface.displayMsg(textMessage.getText());
+                }else {
+                    while(messageInterface==null)
+                        System.out.print(".");
+                    messageInterface.displayMsg(textMessage.getText());
+                }
             } catch (javax.jms.JMSException jmse) {
                 jmse.printStackTrace();
             } catch (RemoteException e) {
@@ -90,7 +98,7 @@ public class DurableChat implements
     /**
      * Cleanup resources cleanly and exit.
      */
-    private void exit() {
+    public void exit() {
         try {
             connection.close();
         } catch (javax.jms.JMSException jmse) {
@@ -98,6 +106,13 @@ public class DurableChat implements
         }
 
         return;
+    }
+    public void start(){
+        try {
+            connection.start();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean send(String s, String topic) {
@@ -160,7 +175,6 @@ public class DurableChat implements
             subscribers.put(roomname, subscriber);
             publishers.put(roomname, pubSession.createProducer(topic));
             topics.put(roomname, topic);
-            connection.start();
             return true;
         } catch (javax.jms.JMSException jmse) {
             System.out.println("Error: connection not started.");

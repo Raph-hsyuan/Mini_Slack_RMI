@@ -54,6 +54,8 @@ public class MiniSlackService extends UnicastRemoteObject implements ServiceInte
             if (users.get(clientName).equals(password)) {
                 System.out.println(" >" + clientName + " login ----> success");
                 this.userStates.replace(clientName, true);
+                this.subscribes.get(clientName).start();
+
                 return true;
             } else {
                 System.out.println(" >" + clientName + " login ----> failure");
