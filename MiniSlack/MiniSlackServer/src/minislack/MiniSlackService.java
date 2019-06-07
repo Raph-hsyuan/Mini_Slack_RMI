@@ -12,15 +12,15 @@ public class MiniSlackService extends UnicastRemoteObject implements ServiceInte
     private Hashtable<String, String> users;
     private Hashtable<String, Boolean> userStates;
     private Hashtable<String, String> groups;
-    private Hashtable<String, List<DurableChat>> subscribes;
+    private Hashtable<String, DurableChat> subscribes;
 
     MiniSlackService() throws RemoteException {
         groups = new Hashtable<>();
         users = new Hashtable<>();
         userStates = new Hashtable<>();
         subscribes = new Hashtable<>();
-        initialUsers();
         initialGroups();
+        initialUsers();
     }
 
     void initialUsers() {
@@ -30,15 +30,6 @@ public class MiniSlackService extends UnicastRemoteObject implements ServiceInte
         userStates.put("Bob", false);
         userStates.put("Alice", false);
         userStates.put("Peter", false);
-        subscribes.put("Bob", new ArrayList<>());
-        subscribes.put("Alice", new ArrayList<>());
-        subscribes.put("Peter", new ArrayList<>());
-    }
-
-    void initialGroups() throws RemoteException {
-
-        groups.put("PS8", "tcp://localhost:61616");
-        groups.put("RMILearningGroup", "tcp://localhost:61616");
         DurableChat bob = new DurableChat(groups.get("RMILearningGroup"), "Bob", "");
         DurableChat alice = new DurableChat(groups.get("RMILearningGroup"), "Alice", "");
         DurableChat peter = new DurableChat(groups.get("RMILearningGroup"), "Peter", "");
@@ -47,9 +38,14 @@ public class MiniSlackService extends UnicastRemoteObject implements ServiceInte
         peter.joinTopic("RMILearningGroup");
         alice.joinTopic("PS8");
         peter.joinTopic("PS8");
-        subscribes.get("Bob").add(bob);
-        subscribes.get("Alice").add(alice);
-        subscribes.get("Peter").add(peter);
+        subscribes.put("Bob", bob);
+        subscribes.put("Alice", alice);
+        subscribes.put("Peter", peter);
+    }
+
+    void initialGroups() throws RemoteException {
+        groups.put("PS8", "tcp://localhost:61616");
+        groups.put("RMILearningGroup", "tcp://localhost:61616");
     }
 
     @Override
@@ -90,7 +86,7 @@ public class MiniSlackService extends UnicastRemoteObject implements ServiceInte
     @Override
     public List<String> getCurrentGroups(String clientName) throws RemoteException {
         if (this.userStates.get(clientName)) {
-            return subscribes.get(clientName).get(0).getTopics();
+            return subscribes.get(clientName).getTopics();
         } else {
             throw new RuntimeException("[WARN] Login Required");
         }
@@ -98,26 +94,22 @@ public class MiniSlackService extends UnicastRemoteObject implements ServiceInte
 
     @Override
     public boolean joinGroup(String clientName, String groupName) throws RemoteException {
-
-        return false;
+        return subscribes.get(clientName).joinTopic(groupName);
     }
 
     @Override
     public boolean leaveGroup(String clientName, String groupName) throws RemoteException {
-
-        return false;
+        return subscribes.get(clientName).leaveTopic(groupName);
     }
 
     @Override
     public void bindClientMessage(String username, int port) throws RemoteException {
-        for (DurableChat durableChat : subscribes.get(username)) {
-            durableChat.bindMessageClient(username, port);
-        }
+        subscribes.get(username).bindMessageClient(username, port);
+
     }
 
     @Override
-    public void send(String username, String msg, String topic) {
-        subscribes.get(username).get(0).send(msg, topic);
-
+    public boolean send(String username, String msg, String topic) {
+        return subscribes.get(username).send(msg, topic);
     }
 }

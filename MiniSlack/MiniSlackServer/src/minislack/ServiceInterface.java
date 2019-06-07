@@ -19,5 +19,5 @@ public interface ServiceInterface extends Remote {
 
     void bindClientMessage(String userName, int port) throws RemoteException;
 
-    public void send(String username, String msg, String topic) throws RemoteException;
+    public boolean send(String username, String msg, String topic) throws RemoteException;
 }

@@ -17,6 +17,7 @@ package minislack; /**
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
+import javax.jms.JMSException;
 import javax.jms.Topic;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -35,9 +36,11 @@ public class DurableChat implements
     private javax.jms.Session pubSession = null;
     private javax.jms.Session subSession = null;
     public String username = null;
-    private javax.jms.MessageProducer publisher = null;
+    private Hashtable<String, javax.jms.MessageProducer> publishers = new Hashtable<>();
     ClientMessageInterface messageInterface = null;
     private Hashtable<String, Topic> topics = new Hashtable<>();
+    private Hashtable<String, javax.jms.MessageConsumer> subscribers = new Hashtable<>();
+
 
     public DurableChat(String broker, String username, String password) {
         this.username = username;
@@ -73,7 +76,6 @@ public class DurableChat implements
             // message and prints it to the standard output.
             try {
                 String string = textMessage.getText();
-                System.out.println(string);
                 messageInterface.displayMsg(string);
             } catch (javax.jms.JMSException jmse) {
                 jmse.printStackTrace();
@@ -81,7 +83,6 @@ public class DurableChat implements
                 e.printStackTrace();
             }
         } catch (RuntimeException rte) {
-            rte.printStackTrace();
         }
     }
 
@@ -100,12 +101,14 @@ public class DurableChat implements
     }
 
     public boolean send(String s, String topic) {
-        //Wait for user input
+        if (!topics.keySet().contains(topic)) {
+            return false;
+        }
         if (s.length() > 0) {
             try {
                 javax.jms.TextMessage msg = pubSession.createTextMessage();
                 msg.setText(this.username + " from " + topic + " : " + s);
-                publisher.send(
+                publishers.get(topic).send(
                         topics.get(topic),
                         msg,                               //message
                         javax.jms.DeliveryMode.PERSISTENT, //publish persistently
@@ -129,24 +132,42 @@ public class DurableChat implements
         }
     }
 
-    public void joinTopic(String roomname) {
+    public boolean leaveTopic(String roomname) {
+        if (topics.keySet().contains(roomname)) {
+            topics.remove(roomname);
+            try {
+                subscribers.get(roomname).close();
+                publishers.get(roomname).close();
+                subscribers.remove(roomname);
+                publishers.remove(roomname);
+                return true;
+            } catch (JMSException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    public boolean joinTopic(String roomname) {
+        if (topics.keySet().contains(roomname)) return false;
         javax.jms.Topic topic = null;
-        javax.jms.MessageConsumer subscriber = null;
         //Create Publisher and Durable Subscriber:
         try {
             topic = pubSession.createTopic(roomname);
+            javax.jms.MessageConsumer subscriber = null;
             subscriber = subSession.createDurableSubscriber(topic, username + Math.random());
             subscriber.setMessageListener(this);
-            publisher = pubSession.createProducer(topic);
+            subscribers.put(roomname, subscriber);
+            publishers.put(roomname, pubSession.createProducer(topic));
             topics.put(roomname, topic);
             connection.start();
-            System.out.print(1);
-
+            return true;
         } catch (javax.jms.JMSException jmse) {
             System.out.println("Error: connection not started.");
             jmse.printStackTrace();
             System.exit(1);
         }
+        return false;
     }
 
     public List<String> getTopics() {
