@@ -35,7 +35,16 @@ public class Client {
                     printHelp();
                     break;
                 case "mygroups":
+                    System.out.println(client.getMyGroups());
                     break;
+                case "allgroups":
+                    System.out.println(client.getAllGroups());
+                    break;
+                case "send":
+                    System.out.println("> Send to which group?");
+                    String group = sc.nextLine();
+                    System.out.println("> Your msg :");
+                    client.send(sc.nextLine(),group);
                 case "enter":
                     break;
                 case "subscribe":
@@ -58,6 +67,7 @@ public class Client {
         System.out.println("## Enter 'enter' choose a group to enter ##");
         System.out.println("## Enter 'subscribe' choose a group to subscribe ##");
         System.out.println("## Enter 'unsubscribe' choose a group to unsubscribe ##");
+        System.out.println("## Enter 'send' choose a group to send ##");
         System.out.println("## Enter 'exit' logout and exit ##");
 
     }

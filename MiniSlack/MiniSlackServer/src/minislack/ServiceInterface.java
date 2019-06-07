@@ -16,4 +16,8 @@ public interface ServiceInterface extends Remote {
     boolean joinGroup(String clientName, String groupName) throws RemoteException;
 
     boolean leaveGroup(String clientName, String groupName) throws RemoteException;
+
+    void bindClientMessage(String userName, int port) throws RemoteException;
+
+    public void send(String username, String msg, String topic) throws RemoteException;
 }
